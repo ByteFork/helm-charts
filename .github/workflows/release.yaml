@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
   release:
@@ -42,6 +43,16 @@ jobs:
           skip_existing: true
         env:
           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push charts to GHCR (OCI)
+        if: hashFiles('.cr-release-packages/*.tgz') != ''
+        run: |
+          owner="$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')"
+          echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u "${{ github.actor }}" --password-stdin
+          for pkg in .cr-release-packages/*.tgz; do
+            helm push "$pkg" "oci://ghcr.io/${owner}/charts"
+          done
+          helm registry logout ghcr.io
 
       - name: Stage gh-pages assets
         run: |
