@@ -58,6 +58,7 @@ jobs:
         run: |
           mkdir -p _pages
           [ -f README.md ] && cp README.md _pages/
+          [ -f artifacthub-repo.yml ] && cp artifacthub-repo.yml _pages/
           ls -la _pages
 
       - name: Publish gh-pages assets
