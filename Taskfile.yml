@@ -26,9 +26,14 @@ tasks:
       - helm dependency build charts/common-app/examples/render-chart --skip-refresh
 
   lint:
-    desc: Run chart-testing lint across all charts
+    desc: Run chart-testing lint across all charts (matches CI; needs yamllint installed)
     cmds:
-      - ct lint --config .ct/ct.yaml --all --validate-yaml=false
+      - ct lint --config .ct/ct.yaml --all --validate-yaml=true
+
+  lint:fix:
+    desc: Auto-format YAML files (Google yamlfmt; honors .yamlfmt include/exclude)
+    cmds:
+      - yamlfmt
 
   render:
     desc: Render manifests and validate with kubeconform

@@ -175,7 +175,7 @@ jobs:
           fi
 
       - name: Verify generated README is current
-        run: |
+        run: |-
           chart="charts/${{ matrix.chart }}"
           if [ -f "$chart/README.md.gotmpl" ]; then
             before=$(mktemp); after=$(mktemp)
