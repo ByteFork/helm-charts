@@ -6,6 +6,7 @@
 Helm charts published by ByteFork.
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/bytefork)](https://artifacthub.io/packages/search?repo=bytefork)
 [![Release](https://github.com/ByteFork/helm-charts/actions/workflows/release.yaml/badge.svg)](https://github.com/ByteFork/helm-charts/actions/workflows/release.yaml)
 
 </div>
