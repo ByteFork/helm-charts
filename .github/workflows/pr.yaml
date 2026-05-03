@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - ".ct/**"
-      - ".github/workflows/pr.yaml"
+      - ".github/**"
       - ".github/packages.yaml"
       - "charts/**"
       - "Taskfile.yml"
@@ -94,7 +94,7 @@ jobs:
       - name: Install helm-schema plugin
         if: steps.cache-helm-plugins.outputs.cache-hit != 'true'
         run: |
-          helm plugin install https://github.com/losisin/helm-values-schema-json.git --version ${{ env.HELM_SCHEMA_PLUGIN_VERSION }}
+          helm plugin install https://github.com/losisin/helm-values-schema-json.git --version ${{ env.HELM_SCHEMA_PLUGIN_VERSION }} --verify=false
 
       - name: Install yamllint
         run: |
