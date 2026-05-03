@@ -32,7 +32,7 @@ jobs:
         run: |
           for chart in charts/*/; do
             if grep -q '^dependencies:' "$chart/Chart.yaml" 2>/dev/null; then
-              helm dependency build "$chart" --skip-refresh
+              helm dependency build "$chart"
             fi
           done
 

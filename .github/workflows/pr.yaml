@@ -110,10 +110,10 @@ jobs:
       - name: Build chart dependencies
         run: |
           if grep -q '^dependencies:' charts/${{ matrix.chart }}/Chart.yaml; then
-            helm dependency build charts/${{ matrix.chart }} --skip-refresh
+            helm dependency build charts/${{ matrix.chart }}
           fi
           if [ "${{ matrix.chart }}" = "common-app" ]; then
-            helm dependency build charts/common-app/examples/render-chart --skip-refresh
+            helm dependency build charts/common-app/examples/render-chart
           fi
 
       - name: Chart-testing lint

@@ -25,7 +25,7 @@
     </filter>
   </defs>
 
-  <rect width="1280" height="320" fill="url(#bg)"/>
+  <rect width="1280" height="320" rx="18" fill="url(#bg)"/>
 
   <g opacity="0.42" filter="url(#shadow)">
     <rect x="90" y="62" width="286" height="196" rx="14" fill="url(#panel)" stroke="rgba(255,255,255,0.06)"/>
@@ -84,5 +84,5 @@
   <text x="555" y="204"
         font-family="Inter, system-ui, -apple-system, Segoe UI, sans-serif"
         font-size="22" font-weight="500"
-        fill="#94a3b8">Reusable Kubernetes deployment packages</text>
+        fill="#94a3b8">ByteFork's Helm chart collection</text>
 </svg>
