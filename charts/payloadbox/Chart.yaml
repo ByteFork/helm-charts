@@ -2,7 +2,7 @@ apiVersion: v2
 name: payloadbox
 description: Lightweight, self-hosted HTTP Request Inspector with a built-in web interface.
 type: application
-version: 0.0.1
+version: 0.0.2
 appVersion: "0.0.6"
 home: https://github.com/ByteFork/helm-charts
 sources:
@@ -13,7 +13,7 @@ maintainers:
 dependencies:
   - name: common-app
     version: 0.0.1
-    repository: file://../common-app
+    repository: https://bytefork.github.io/helm-charts
 annotations:
   artifacthub.io/category: integration-delivery
   artifacthub.io/license: MIT
