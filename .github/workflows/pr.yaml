@@ -1,0 +1,189 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".ct/**"
+      - ".github/workflows/pr.yaml"
+      - ".github/packages.yaml"
+      - "charts/**"
+      - "Taskfile.yml"
+      - "CONTRIBUTING.md"
+      - "README.md"
+
+permissions:
+  contents: read
+
+env:
+  KUBERNETES_VERSION: "1.32.0"
+  KUBECONFORM_VERSION: "v0.7.0"
+  HELM_DOCS_VERSION: "v1.14.2"
+  HELM_SCHEMA_PLUGIN_VERSION: "v2.4.0"
+  CRD_SCHEMA_LOCATION: "https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json"
+
+jobs:
+  changes:
+    name: Detect chart changes
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      charts: ${{ steps.filter.outputs.changes }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect changed charts
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: .github/packages.yaml
+
+  charts:
+    name: Charts
+    needs: changes
+    if: ${{ needs.changes.outputs.charts != '[]' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        chart: ${{ fromJSON(needs.changes.outputs.charts) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Cache Go bin
+        id: cache-go-bin
+        uses: actions/cache@v4
+        with:
+          path: ~/go/bin
+          key: ${{ runner.os }}-go-bin-kubeconform-${{ env.KUBECONFORM_VERSION }}-helm-docs-${{ env.HELM_DOCS_VERSION }}
+
+      - name: Cache helm plugins
+        id: cache-helm-plugins
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/helm/plugins
+          key: ${{ runner.os }}-helm-plugins-schema-${{ env.HELM_SCHEMA_PLUGIN_VERSION }}
+
+      - name: Install Go tools
+        if: steps.cache-go-bin.outputs.cache-hit != 'true'
+        run: |
+          go install github.com/yannh/kubeconform/cmd/kubeconform@${{ env.KUBECONFORM_VERSION }}
+          go install github.com/norwoodj/helm-docs/cmd/helm-docs@${{ env.HELM_DOCS_VERSION }}
+
+      - name: Install helm-schema plugin
+        if: steps.cache-helm-plugins.outputs.cache-hit != 'true'
+        run: |
+          helm plugin install https://github.com/losisin/helm-values-schema-json.git --version ${{ env.HELM_SCHEMA_PLUGIN_VERSION }}
+
+      - name: Install yamllint
+        run: |
+          python3 -m pip install --user yamllint
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Add Go bin to PATH
+        run: echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: Install chart-testing
+        uses: helm/chart-testing-action@v2.8.0
+
+      - name: Build chart dependencies
+        run: |
+          if grep -q '^dependencies:' charts/${{ matrix.chart }}/Chart.yaml; then
+            helm dependency build charts/${{ matrix.chart }} --skip-refresh
+          fi
+          if [ "${{ matrix.chart }}" = "common-app" ]; then
+            helm dependency build charts/common-app/examples/render-chart --skip-refresh
+          fi
+
+      - name: Chart-testing lint
+        run: |
+          ct lint --config .ct/ct.yaml \
+            --charts charts/${{ matrix.chart }} \
+            --target-branch ${{ github.base_ref }} \
+            --validate-yaml=true
+
+      - name: Cache kubeconform schemas
+        uses: actions/cache@v4
+        with:
+          path: .cache/kubeconform
+          key: ${{ runner.os }}-kubeconform-${{ env.KUBERNETES_VERSION }}-${{ hashFiles('charts/**/*.tpl', 'charts/**/values.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-kubeconform-${{ env.KUBERNETES_VERSION }}-
+
+      - name: Render and validate manifests
+        run: |
+          mkdir -p .cache/kubeconform
+          render() {
+            local name="$1"; shift
+            "$@" | kubeconform -strict -summary \
+              -cache .cache/kubeconform \
+              -kubernetes-version "${KUBERNETES_VERSION}" \
+              -schema-location "${CRD_SCHEMA_LOCATION}" \
+              -schema-location default
+            echo "Validated rendered manifests for ${name}"
+          }
+          case "${{ matrix.chart }}" in
+            common-app)
+              render common-app-fixture \
+                helm template common-app-fixture charts/common-app/examples/render-chart \
+                  --values charts/common-app/examples/render-chart/ci/values.yaml
+              ;;
+            payloadbox)
+              render payloadbox-default \
+                helm template payloadbox charts/payloadbox
+              render payloadbox-ingress \
+                helm template payloadbox charts/payloadbox \
+                  --values charts/payloadbox/ci/ingress-values.yaml
+              ;;
+            *)
+              render "${{ matrix.chart }}" \
+                helm template "${{ matrix.chart }}" "charts/${{ matrix.chart }}"
+              ;;
+          esac
+
+      - name: Verify values.schema.json is current
+        run: |
+          chart="charts/${{ matrix.chart }}"
+          before=$(mktemp); after=$(mktemp)
+          cp "$chart/values.schema.json" "$before"
+          helm schema --draft 7 --values "$chart/values.yaml" --output "$chart/values.schema.json"
+          cp "$chart/values.schema.json" "$after"
+          if ! diff -u "$before" "$after"; then
+            echo "::error::Generated values.schema.json is out of date for $chart. Run 'task schema'."
+            exit 1
+          fi
+
+      - name: Verify generated README is current
+        run: |
+          chart="charts/${{ matrix.chart }}"
+          if [ -f "$chart/README.md.gotmpl" ]; then
+            before=$(mktemp); after=$(mktemp)
+            cp "$chart/README.md" "$before"
+            helm-docs --chart-search-root charts --chart-to-generate "$chart" --sort-values-order file
+            cp "$chart/README.md" "$after"
+            if ! diff -u "$before" "$after"; then
+              echo "::error::Generated README is out of date for $chart. Run 'task docs'."
+              exit 1
+            fi
+          fi

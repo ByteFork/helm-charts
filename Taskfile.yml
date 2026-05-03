@@ -1,0 +1,126 @@
+version: '3'
+
+vars:
+  KUBERNETES_VERSION: 1.32.0
+  KUBECONFORM_CACHE: .cache/kubeconform
+  CRD_SCHEMA_LOCATION: '{{"https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json"}}'
+
+tasks:
+  default:
+    cmds:
+      - task --list
+
+  list:
+    desc: List top-level chart names
+    silent: true
+    cmds:
+      - |
+        for f in charts/*/Chart.yaml; do
+          basename "$(dirname "$f")"
+        done
+
+  deps:
+    desc: Build chart dependencies for charts that have them
+    cmds:
+      - helm dependency build charts/payloadbox --skip-refresh
+      - helm dependency build charts/common-app/examples/render-chart --skip-refresh
+
+  lint:
+    desc: Run chart-testing lint across all charts
+    cmds:
+      - ct lint --config .ct/ct.yaml --all --validate-yaml=false
+
+  render:
+    desc: Render manifests and validate with kubeconform
+    deps: [deps]
+    cmds:
+      - mkdir -p {{.KUBECONFORM_CACHE}}
+      - cmd: |
+          helm template common-app-fixture charts/common-app/examples/render-chart \
+            --values charts/common-app/examples/render-chart/ci/values.yaml \
+          | kubeconform -strict -summary \
+            -cache {{.KUBECONFORM_CACHE}} \
+            -kubernetes-version {{.KUBERNETES_VERSION}} \
+            -schema-location '{{.CRD_SCHEMA_LOCATION}}' \
+            -schema-location default
+          echo "Validated rendered manifests for common-app-fixture"
+      - cmd: |
+          helm template payloadbox charts/payloadbox \
+          | kubeconform -strict -summary \
+            -cache {{.KUBECONFORM_CACHE}} \
+            -kubernetes-version {{.KUBERNETES_VERSION}} \
+            -schema-location '{{.CRD_SCHEMA_LOCATION}}' \
+            -schema-location default
+          echo "Validated rendered manifests for payloadbox-default"
+      - cmd: |
+          helm template payloadbox charts/payloadbox \
+            --values charts/payloadbox/ci/ingress-values.yaml \
+          | kubeconform -strict -summary \
+            -cache {{.KUBECONFORM_CACHE}} \
+            -kubernetes-version {{.KUBERNETES_VERSION}} \
+            -schema-location '{{.CRD_SCHEMA_LOCATION}}' \
+            -schema-location default
+          echo "Validated rendered manifests for payloadbox-ingress"
+
+  schema:
+    desc: Regenerate values.schema.json files
+    cmds:
+      - helm schema --draft 7 --values charts/common-app/values.yaml --output charts/common-app/values.schema.json
+      - helm schema --draft 7 --values charts/payloadbox/values.yaml --output charts/payloadbox/values.schema.json
+
+  schema:check:
+    desc: Verify values.schema.json files are up to date
+    cmds:
+      - cmd: |
+          set -e
+          for chart in charts/common-app charts/payloadbox; do
+            before=$(mktemp); after=$(mktemp)
+            cp "$chart/values.schema.json" "$before"
+            helm schema --draft 7 --values "$chart/values.yaml" --output "$chart/values.schema.json"
+            cp "$chart/values.schema.json" "$after"
+            if ! diff -u "$before" "$after"; then
+              echo "Generated values.schema.json is out of date for $chart. Run 'task schema'." >&2
+              rm -f "$before" "$after"
+              exit 1
+            fi
+            rm -f "$before" "$after"
+          done
+
+  docs:
+    desc: Regenerate helm-docs READMEs (charts with README.md.gotmpl)
+    cmds:
+      - cmd: |
+          set -e
+          for chart in charts/common-app charts/payloadbox; do
+            if [ -f "$chart/README.md.gotmpl" ]; then
+              helm-docs --chart-search-root charts --chart-to-generate "$chart" --sort-values-order file
+            fi
+          done
+
+  docs:check:
+    desc: Verify generated README files are up to date
+    cmds:
+      - cmd: |
+          set -e
+          for chart in charts/common-app charts/payloadbox; do
+            if [ -f "$chart/README.md.gotmpl" ]; then
+              before=$(mktemp); after=$(mktemp)
+              cp "$chart/README.md" "$before"
+              helm-docs --chart-search-root charts --chart-to-generate "$chart" --sort-values-order file
+              cp "$chart/README.md" "$after"
+              if ! diff -u "$before" "$after"; then
+                echo "Generated README is out of date for $chart. Run 'task docs'." >&2
+                rm -f "$before" "$after"
+                exit 1
+              fi
+              rm -f "$before" "$after"
+            fi
+          done
+
+  check:
+    desc: Run lint, render, schema:check, docs:check
+    cmds:
+      - task: lint
+      - task: render
+      - task: schema:check
+      - task: docs:check

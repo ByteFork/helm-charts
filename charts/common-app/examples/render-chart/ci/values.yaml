@@ -1,0 +1,185 @@
+image:
+  repository: nginxinc/nginx-unprivileged
+  tag: stable-alpine
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+commonLabels: {}
+commonAnnotations: {}
+
+serviceAccount:
+  create: true
+  name: ""
+  automountServiceAccountToken: true
+  annotations: {}
+  labels: {}
+
+deployment:
+  enabled: true
+  annotations: {}
+  labels: {}
+
+statefulSet:
+  enabled: false
+  annotations: {}
+  labels: {}
+  serviceName: ""
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates: []
+
+imagePullSecrets: []
+podAnnotations: {}
+podLabels: {}
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+
+containerPort: 8080
+
+service:
+  enabled: true
+  type: ClusterIP
+  port: 80
+  targetPort: http
+  protocol: TCP
+  annotations: {}
+  labels: {}
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations: {}
+  labels: {}
+  hosts:
+    - host: example.bytefork.test
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+probes:
+  liveness:
+    enabled: true
+    path: /
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
+  readiness:
+    enabled: true
+    path: /
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
+
+env: []
+envMap:
+  LISTEN_ADDRESS: ":8080"
+  LOG_LEVEL: info
+envFrom: []
+
+configMap:
+  enabled: true
+  name: ""
+  annotations: {}
+  labels: {}
+  data:
+    example: value
+
+secret:
+  enabled: true
+  name: ""
+  type: Opaque
+  annotations: {}
+  labels: {}
+  data: {}
+  stringData:
+    token: fixture
+
+serviceMonitor:
+  enabled: true
+  annotations: {}
+  labels:
+    release: kube-prom-stack
+  interval: 30s
+  scrapeTimeout: 10s
+  path: /metrics
+  port: http
+  scheme: http
+  honorLabels: false
+  selector: {}
+  namespaceSelector: {}
+  metricRelabelings: []
+  relabelings: []
+
+podMonitor:
+  enabled: true
+  annotations: {}
+  labels:
+    release: kube-prom-stack
+  interval: 30s
+  scrapeTimeout: 10s
+  path: /metrics
+  port: http
+  scheme: http
+  honorLabels: false
+  selector: {}
+  namespaceSelector: {}
+  metricRelabelings: []
+  relabelings: []
+
+autoscaling:
+  enabled: true
+  annotations: {}
+  labels: {}
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: null
+  behavior: {}
+
+podDisruptionBudget:
+  enabled: true
+  annotations: {}
+  labels: {}
+  minAvailable: 1
+  maxUnavailable: null
+
+networkPolicy:
+  enabled: true
+  annotations: {}
+  labels: {}
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from: []
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress: []
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 64Mi
+  limits:
+    memory: 128Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+extraVolumeMounts: []
+extraVolumes: []

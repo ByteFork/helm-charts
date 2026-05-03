@@ -1,0 +1,57 @@
+{{ template "chart.header" . }}
+
+{{ template "chart.description" . }}
+
+`common-app` is a Helm library chart. It is not installed directly; application charts depend on it and call its named templates.
+
+The library renders one primary application workload per release:
+
+- `Deployment`
+- optional `StatefulSet`
+- `Service`
+- optional `Ingress`
+- optional `ConfigMap`
+- optional `Secret`
+- optional `ServiceAccount`
+- optional `HorizontalPodAutoscaler`
+- optional `PodDisruptionBudget`
+- optional `NetworkPolicy`
+- optional `ServiceMonitor`
+- optional `PodMonitor`
+
+It also centralizes labels, selectors, probes, environment variables, service account configuration, pod security context, container security context, resources, node selectors, tolerations, affinity, and extra volumes.
+
+## Usage
+
+Add `common-app` as a dependency from the ByteFork chart repository or by local path while developing:
+
+```yaml
+dependencies:
+  - name: common-app
+    version: {{ template "chart.version" . }}
+    repository: https://bytefork.github.io/helm-charts
+```
+
+Then render all supported resources from an application chart template:
+
+```gotemplate
+{{ "{{ include \"common-app.all\" . }}" }}
+```
+
+Application charts can also include individual templates such as `common-app.deployment`, `common-app.service`, or `common-app.ingress`.
+
+## Render Check
+
+This repository includes a fixture chart at `examples/render-chart` that depends on `common-app` by local path. Use it to verify the library renders valid manifests:
+
+```sh
+helm dependency build charts/common-app/examples/render-chart --skip-refresh
+helm template common-app-fixture charts/common-app/examples/render-chart \
+  --values charts/common-app/examples/render-chart/ci/values.yaml
+```
+
+## Values
+
+The library expects application charts to expose the values they want to support. At minimum, consumers must set `image.repository`.
+
+{{ template "chart.valuesTable" . }}

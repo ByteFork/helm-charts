@@ -1,0 +1,12 @@
+common-app:
+  - "charts/common-app/**"
+  - ".ct/**"
+  - ".github/workflows/pr.yaml"
+  - ".github/packages.yaml"
+
+payloadbox:
+  - "charts/payloadbox/**"
+  - "charts/common-app/**"
+  - ".ct/**"
+  - ".github/workflows/pr.yaml"
+  - ".github/packages.yaml"

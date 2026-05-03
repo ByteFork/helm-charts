@@ -1,0 +1,15 @@
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: payloadbox.bytefork.test
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 64Mi
+  limits:
+    memory: 128Mi

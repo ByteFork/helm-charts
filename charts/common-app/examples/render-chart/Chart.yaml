@@ -1,0 +1,10 @@
+apiVersion: v2
+name: common-app-render
+description: Render fixture for the common-app library chart.
+type: application
+version: 0.0.1
+appVersion: "0.0.1"
+dependencies:
+  - name: common-app
+    version: 0.0.1
+    repository: file://../..

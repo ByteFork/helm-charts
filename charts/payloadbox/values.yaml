@@ -1,0 +1,184 @@
+replicaCount: 1
+
+nameOverride: ""
+fullnameOverride: ""
+
+commonLabels: {}
+commonAnnotations: {}
+
+image:
+  repository: ghcr.io/bytefork/payloadbox
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+serviceAccount:
+  create: true
+  name: ""
+  automountServiceAccountToken: false
+  annotations: {}
+  labels: {}
+
+deployment:
+  enabled: true
+  annotations: {}
+  labels: {}
+
+statefulSet:
+  enabled: false
+  annotations: {}
+  labels: {}
+  serviceName: ""
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates: []
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+
+containerPort: 8080
+extraContainerPorts: []
+
+service:
+  enabled: true
+  type: ClusterIP
+  port: 8080
+  targetPort: http
+  protocol: TCP
+  extraPorts: []
+  annotations: {}
+  labels: {}
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  labels: {}
+  hosts: []
+  tls: []
+
+probes:
+  liveness:
+    enabled: true
+    path: /healthz
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
+  readiness:
+    enabled: true
+    path: /healthz
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
+
+# PayloadBox application settings rendered into container env vars.
+payloadbox:
+  maxBodySizeBytes: 1048576
+  maxRecordsToStore: 1000
+  logHttpRequests: true
+  logLevel: info
+
+# Additional env entries appended after the typed PayloadBox env.
+extraEnv: []
+# Additional literal env vars merged over the typed PayloadBox env (overrides allowed).
+extraEnvMap: {}
+envFrom: []
+
+configMap:
+  enabled: false
+  name: ""
+  annotations: {}
+  labels: {}
+  data: {}
+
+secret:
+  enabled: false
+  name: ""
+  type: Opaque
+  annotations: {}
+  labels: {}
+  data: {}
+  stringData: {}
+
+serviceMonitor:
+  enabled: false
+  annotations: {}
+  labels: {}
+  interval: 30s
+  scrapeTimeout: 10s
+  path: /metrics
+  port: http
+  scheme: http
+  honorLabels: false
+  selector: {}
+  namespaceSelector: {}
+  metricRelabelings: []
+  relabelings: []
+
+podMonitor:
+  enabled: false
+  annotations: {}
+  labels: {}
+  interval: 30s
+  scrapeTimeout: 10s
+  path: /metrics
+  port: http
+  scheme: http
+  honorLabels: false
+  selector: {}
+  namespaceSelector: {}
+  metricRelabelings: []
+  relabelings: []
+
+autoscaling:
+  enabled: false
+  annotations: {}
+  labels: {}
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: null # @schema type: [integer, "null"]
+  behavior: {}
+
+podDisruptionBudget:
+  enabled: false
+  annotations: {}
+  labels: {}
+  minAvailable: 1
+  maxUnavailable: null # @schema type: [integer, "null"]
+
+networkPolicy:
+  enabled: false
+  annotations: {}
+  labels: {}
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress: []
+  egress: []
+
+resources: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+extraVolumeMounts: []
+extraVolumes: []

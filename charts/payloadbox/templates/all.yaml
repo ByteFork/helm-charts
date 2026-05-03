@@ -1,0 +1,7 @@
+{{- $values := deepCopy .Values -}}
+{{- $envMap := include "payloadbox.envMap" . | fromYaml -}}
+{{- $_ := set $values "envMap" $envMap -}}
+{{- $_ := set $values "env" (default (list) .Values.extraEnv) -}}
+{{- $context := deepCopy . -}}
+{{- $_ := set $context "Values" $values -}}
+{{ include "common-app.all" $context }}

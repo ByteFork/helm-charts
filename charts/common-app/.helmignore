@@ -1,0 +1,3 @@
+examples/render-chart/charts/
+examples/render-chart/Chart.lock
+*.tgz
