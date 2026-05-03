@@ -3,5 +3,6 @@ chart-dirs:
 target-branch: main
 remote: origin
 validate-maintainers: false
+lint-conf: .yamllint
 helm-dependency-extra-args:
   - --skip-refresh

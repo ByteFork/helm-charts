@@ -6,11 +6,13 @@ This repository publishes ByteFork Helm charts.
 
 Install:
 
-- Helm
+- [Helm](https://helm.sh)
 - chart-testing (`ct`)
 - kubeconform
 - helm-docs
 - `helm schema` from `losisin/helm-values-schema-json`
+- yamllint (`uv tool install yamllint`, or `pip3 install --user yamllint`)
+- [yamlfmt](https://github.com/google/yamlfmt) - Google's Go binary, not the Python package of the same name (`brew install yamlfmt`, or `go install github.com/google/yamlfmt/cmd/yamlfmt@latest`)
 - [Task](https://taskfile.dev) (`brew install go-task/tap/go-task` on macOS)
 
 ## Local Workflow
@@ -23,7 +25,8 @@ task check
 
 Available tasks (`task --list` shows the same):
 
-- `task lint` - chart-testing lint across all charts
+- `task lint` - chart-testing lint across all charts (yamllint + helm lint + chart schema)
+- `task lint:fix` - auto-format YAML files with yamlfmt
 - `task render` - render every CI scenario and validate with kubeconform
 - `task schema` - regenerate `values.schema.json` files
 - `task schema:check` - verify schemas are up to date
