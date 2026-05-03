@@ -9,6 +9,9 @@ on:
 permissions:
   contents: write
 
+env:
+  CR_VERSION: "1.7.0"
+
 jobs:
   release:
     name: Package and publish charts
@@ -27,6 +30,14 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@v4
 
+      - name: Install chart-releaser
+        run: |
+          curl -sLo cr.tgz "https://github.com/helm/chart-releaser/releases/download/v${CR_VERSION}/chart-releaser_${CR_VERSION}_linux_amd64.tar.gz"
+          mkdir -p .cr-bin
+          tar -xzf cr.tgz -C .cr-bin
+          echo "$PWD/.cr-bin" >> "$GITHUB_PATH"
+          rm cr.tgz
+
       - name: Build chart dependencies
         run: |
           for chart in charts/*/; do
@@ -35,13 +46,38 @@ jobs:
             fi
           done
 
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.7.0
-        with:
-          charts_dir: charts
-          skip_existing: true
+      - name: Package charts
+        run: |
+          mkdir -p .cr-release-packages
+          for chart in charts/*/; do
+            [ -f "$chart/Chart.yaml" ] || continue
+            helm package "$chart" --destination .cr-release-packages
+          done
+          ls -la .cr-release-packages
+
+      - name: Upload charts to GitHub Releases
         env:
           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cr upload \
+            --owner "${{ github.repository_owner }}" \
+            --repo helm-charts \
+            --packages-dir .cr-release-packages \
+            --skip-existing \
+            --token "$CR_TOKEN"
+
+      - name: Update index.yaml on gh-pages
+        env:
+          CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cr index \
+            --owner "${{ github.repository_owner }}" \
+            --repo helm-charts \
+            --packages-dir .cr-release-packages \
+            --pages-branch gh-pages \
+            --push \
+            --token "$CR_TOKEN" \
+            --charts-repo https://bytefork.github.io/helm-charts
 
       - name: Stage gh-pages assets
         run: |
@@ -55,4 +91,5 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./_pages
           keep_files: true
+          enable_jekyll: true
           commit_message: "chore(pages): sync repo metadata"
