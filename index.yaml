@@ -34,6 +34,37 @@ entries:
           url: https://github.com/ByteFork/helm-charts
     apiVersion: v2
     appVersion: 0.0.6
+    created: "2026-05-03T04:23:37.64471807Z"
+    dependencies:
+    - name: common-app
+      repository: https://bytefork.github.io/helm-charts
+      version: 0.0.1
+    description: Lightweight, self-hosted HTTP Request Inspector with a built-in web
+      interface.
+    digest: f7f568c7dfe694564074b3db8dac8dde36a00b0864e03a00c32c20e2068d5cf6
+    home: https://github.com/ByteFork/helm-charts
+    maintainers:
+    - email: helm@bytefork.io
+      name: ByteFork
+      url: https://github.com/ByteFork
+    name: payloadbox
+    sources:
+    - https://github.com/ByteFork/helm-charts
+    type: application
+    urls:
+    - https://github.com/ByteFork/helm-charts/releases/download/payloadbox-0.0.3/payloadbox-0.0.3.tgz
+    version: 0.0.3
+  - annotations:
+      artifacthub.io/category: integration-delivery
+      artifacthub.io/images: |-
+        - name: payloadbox
+          image: ghcr.io/bytefork/payloadbox:0.0.4
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Source
+          url: https://github.com/ByteFork/helm-charts
+    apiVersion: v2
+    appVersion: 0.0.6
     created: "2026-05-03T03:45:23.239999893Z"
     dependencies:
     - name: common-app
@@ -83,4 +114,4 @@ entries:
     urls:
     - https://github.com/ByteFork/helm-charts/releases/download/payloadbox-0.0.1/payloadbox-0.0.1.tgz
     version: 0.0.1
-generated: "2026-05-03T03:45:23.240014114Z"
+generated: "2026-05-03T04:23:37.644730513Z"
