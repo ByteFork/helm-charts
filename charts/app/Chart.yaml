@@ -1,0 +1,23 @@
+apiVersion: v2
+name: app
+description: Generic installable application chart backed by the common-app library. Deploy any container with a Deployment or StatefulSet, Service, Ingress, probes, monitors, autoscaling, and network policies through values alone.
+type: application
+version: 0.0.1
+appVersion: "0.0.1"
+home: https://github.com/ByteFork/helm-charts
+sources:
+  - https://github.com/ByteFork/helm-charts
+maintainers:
+  - name: ByteFork
+    email: helm@bytefork.io
+    url: https://github.com/ByteFork
+dependencies:
+  - name: common-app
+    version: 0.0.1
+    repository: https://bytefork.github.io/helm-charts
+annotations:
+  artifacthub.io/category: skip
+  artifacthub.io/license: MIT
+  artifacthub.io/links: |
+    - name: Source
+      url: https://github.com/ByteFork/helm-charts

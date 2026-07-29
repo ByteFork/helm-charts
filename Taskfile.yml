@@ -22,6 +22,7 @@ tasks:
   deps:
     desc: Build chart dependencies for charts that have them
     cmds:
+      - helm dependency build charts/app --skip-refresh
       - helm dependency build charts/payloadbox --skip-refresh
       - helm dependency build charts/common-app/examples/render-chart --skip-refresh
 
