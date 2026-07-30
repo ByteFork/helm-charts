@@ -1,0 +1,326 @@
+# Default values for the app chart (generic installable wrapper around
+# the common-app library).
+#
+# Required: image.repository (and usually image.tag).
+#
+# Naming: with a generic chart named "app", the fullname helper renders a
+# release "my-service" as "my-service-app". Set fullnameOverride (or
+# nameOverride) per release to keep resource names clean:
+#
+#   fullnameOverride: my-service
+
+# -- Number of application replicas.
+replicaCount: 1
+
+# -- Override the chart name used in resource names.
+nameOverride: ""
+# -- Override the full generated resource name.
+fullnameOverride: ""
+
+# -- Labels added to all resources rendered by the library.
+commonLabels: {}
+# -- Annotations added to all resources rendered by the library.
+commonAnnotations: {}
+
+# -- ServiceAccount configuration for the workload.
+serviceAccount:
+  # -- Create a ServiceAccount.
+  create: true
+  # -- Name of the ServiceAccount to create or use. Defaults to the chart fullname.
+  name: ""
+  # -- Whether pods should automount the ServiceAccount token.
+  automountServiceAccountToken: false
+  # -- Annotations added to the ServiceAccount.
+  annotations: {}
+  # -- Labels added to the ServiceAccount.
+  labels: {}
+
+# -- Container image configuration.
+image:
+  # -- Container image repository. Required by consuming charts.
+  repository: ""
+  # -- Container image tag. Defaults to chart `appVersion` when empty.
+  tag: ""
+  # -- Container image pull policy.
+  pullPolicy: IfNotPresent
+
+# -- Image pull secrets attached to the pod.
+imagePullSecrets: []
+
+# -- Deployment configuration.
+deployment:
+  # -- Create a Deployment workload.
+  enabled: true
+  # -- Annotations added to the Deployment.
+  annotations: {}
+  # -- Labels added to the Deployment.
+  labels: {}
+
+# -- StatefulSet configuration. Enable instead of Deployment for workloads that require stable identity.
+statefulSet:
+  # -- Create a StatefulSet workload.
+  enabled: false
+  # -- Annotations added to the StatefulSet.
+  annotations: {}
+  # -- Labels added to the StatefulSet.
+  labels: {}
+  # -- StatefulSet serviceName. Defaults to the chart fullname.
+  serviceName: ""
+  # -- StatefulSet pod management policy.
+  podManagementPolicy: OrderedReady
+  # -- StatefulSet update strategy.
+  updateStrategy:
+    type: RollingUpdate
+  # -- StatefulSet volume claim templates.
+  volumeClaimTemplates: []
+
+# -- Annotations added to workload pods.
+podAnnotations: {}
+# -- Labels added to workload pods.
+podLabels: {}
+
+# -- Pod security context.
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# -- Container security context.
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+
+# -- Service configuration.
+service:
+  # -- Create a Service.
+  enabled: true
+  # -- Service type.
+  type: ClusterIP
+  # -- Service port.
+  port: 80
+  # -- Service target port.
+  targetPort: http
+  # -- Service protocol.
+  protocol: TCP
+  # -- Additional Service ports appended after the primary `http` port. Each entry must match the Kubernetes ServicePort shape.
+  extraPorts: []
+  # -- Annotations added to the Service.
+  annotations: {}
+  # -- Labels added to the Service.
+  labels: {}
+
+# -- Primary container HTTP port.
+containerPort: 8080
+
+# -- Additional container ports appended after the primary `http` port. Each entry must match the Kubernetes ContainerPort shape.
+extraContainerPorts: []
+
+# -- Ingress configuration.
+ingress:
+  # -- Create an Ingress.
+  enabled: false
+  # -- IngressClass name.
+  className: ""
+  # -- Annotations added to the Ingress.
+  annotations: {}
+  # -- Labels added to the Ingress.
+  labels: {}
+  # -- Ingress host rules.
+  hosts: []
+  # -- Ingress TLS configuration.
+  tls: []
+
+# -- HTTP probe configuration.
+probes:
+  # -- Liveness probe configuration.
+  liveness:
+    # -- Enable the liveness probe.
+    enabled: true
+    # -- Liveness probe HTTP path.
+    path: /healthz
+    # -- Liveness probe initial delay in seconds.
+    initialDelaySeconds: 10
+    # -- Liveness probe period in seconds.
+    periodSeconds: 10
+    # -- Liveness probe timeout in seconds.
+    timeoutSeconds: 2
+    # -- Liveness probe failure threshold.
+    failureThreshold: 3
+  # -- Readiness probe configuration.
+  readiness:
+    # -- Enable the readiness probe.
+    enabled: true
+    # -- Readiness probe HTTP path.
+    path: /healthz
+    # -- Readiness probe initial delay in seconds.
+    initialDelaySeconds: 5
+    # -- Readiness probe period in seconds.
+    periodSeconds: 10
+    # -- Readiness probe timeout in seconds.
+    timeoutSeconds: 2
+    # -- Readiness probe failure threshold.
+    failureThreshold: 3
+
+# -- Additional Kubernetes env entries.
+env: []
+# -- Additional literal environment variables rendered as Kubernetes env entries.
+envMap: {}
+# -- Additional envFrom entries.
+envFrom: []
+
+# -- ConfigMap configuration.
+configMap:
+  # -- Create a ConfigMap.
+  enabled: false
+  # -- ConfigMap name. Defaults to `<fullname>-config`.
+  name: ""
+  # -- Annotations added to the ConfigMap.
+  annotations: {}
+  # -- Labels added to the ConfigMap.
+  labels: {}
+  # -- ConfigMap data.
+  data: {}
+
+# -- Secret configuration.
+secret:
+  # -- Create a Secret.
+  enabled: false
+  # -- Secret name. Defaults to `<fullname>-secret`.
+  name: ""
+  # -- Secret type.
+  type: Opaque
+  # -- Annotations added to the Secret.
+  annotations: {}
+  # -- Labels added to the Secret.
+  labels: {}
+  # -- Secret data. Values must be base64-encoded.
+  data: {}
+  # -- Secret stringData. Values are encoded by Kubernetes.
+  stringData: {}
+
+# -- Prometheus Operator ServiceMonitor configuration.
+serviceMonitor:
+  # -- Create a ServiceMonitor.
+  enabled: false
+  # -- Annotations added to the ServiceMonitor.
+  annotations: {}
+  # -- Labels added to the ServiceMonitor.
+  labels: {}
+  # -- Scrape interval.
+  interval: 30s
+  # -- Scrape timeout.
+  scrapeTimeout: 10s
+  # -- Metrics HTTP path.
+  path: /metrics
+  # -- Named service port to scrape.
+  port: http
+  # -- Metrics scheme.
+  scheme: http
+  # -- Honor labels from scraped metrics.
+  honorLabels: false
+  # -- Additional selector labels.
+  selector: {}
+  # -- ServiceMonitor namespace selector.
+  namespaceSelector: {}
+  # -- Metric relabeling rules.
+  metricRelabelings: []
+  # -- Relabeling rules.
+  relabelings: []
+
+# -- Prometheus Operator PodMonitor configuration.
+podMonitor:
+  # -- Create a PodMonitor.
+  enabled: false
+  # -- Annotations added to the PodMonitor.
+  annotations: {}
+  # -- Labels added to the PodMonitor.
+  labels: {}
+  # -- Scrape interval.
+  interval: 30s
+  # -- Scrape timeout.
+  scrapeTimeout: 10s
+  # -- Metrics HTTP path.
+  path: /metrics
+  # -- Named pod port to scrape.
+  port: http
+  # -- Metrics scheme.
+  scheme: http
+  # -- Honor labels from scraped metrics.
+  honorLabels: false
+  # -- Additional selector labels.
+  selector: {}
+  # -- PodMonitor namespace selector.
+  namespaceSelector: {}
+  # -- Metric relabeling rules.
+  metricRelabelings: []
+  # -- Relabeling rules.
+  relabelings: []
+
+# -- HorizontalPodAutoscaler configuration.
+autoscaling:
+  # -- Create a HorizontalPodAutoscaler.
+  enabled: false
+  # -- Annotations added to the HorizontalPodAutoscaler.
+  annotations: {}
+  # -- Labels added to the HorizontalPodAutoscaler.
+  labels: {}
+  # -- Minimum number of replicas.
+  minReplicas: 1
+  # -- Maximum number of replicas.
+  maxReplicas: 3
+  # -- Target average CPU utilization percentage.
+  targetCPUUtilizationPercentage: 80
+  # -- Target average memory utilization percentage.
+  targetMemoryUtilizationPercentage: null # @schema type: [integer, "null"]
+  # -- HorizontalPodAutoscaler behavior configuration.
+  behavior: {}
+
+# -- PodDisruptionBudget configuration.
+podDisruptionBudget:
+  # -- Create a PodDisruptionBudget.
+  enabled: false
+  # -- Annotations added to the PodDisruptionBudget.
+  annotations: {}
+  # -- Labels added to the PodDisruptionBudget.
+  labels: {}
+  # -- Minimum available pods.
+  minAvailable: 1
+  # -- Maximum unavailable pods. Takes precedence over minAvailable when set.
+  maxUnavailable: null # @schema type: [integer, "null"]
+
+# -- NetworkPolicy configuration.
+networkPolicy:
+  # -- Create a NetworkPolicy.
+  enabled: false
+  # -- Annotations added to the NetworkPolicy.
+  annotations: {}
+  # -- Labels added to the NetworkPolicy.
+  labels: {}
+  # -- Additional pod selector labels.
+  podSelector: {}
+  # -- NetworkPolicy policy types.
+  policyTypes:
+    - Ingress
+  # -- NetworkPolicy ingress rules.
+  ingress: []
+  # -- NetworkPolicy egress rules.
+  egress: []
+
+# -- Container resource requests and limits.
+resources: {}
+
+# -- Pod node selector.
+nodeSelector: {}
+# -- Pod tolerations.
+tolerations: []
+# -- Pod affinity.
+affinity: {}
+
+# -- Additional volume mounts added to the primary container.
+extraVolumeMounts: []
+# -- Additional volumes added to the pod.
+extraVolumes: []
