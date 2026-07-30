@@ -1,5 +1,35 @@
 apiVersion: v1
 entries:
+  app:
+  - annotations:
+      artifacthub.io/category: skip
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Source
+          url: https://github.com/ByteFork/helm-charts
+    apiVersion: v2
+    appVersion: 0.0.1
+    created: "2026-07-30T00:10:48.338170998Z"
+    dependencies:
+    - name: common-app
+      repository: https://bytefork.github.io/helm-charts
+      version: 0.0.1
+    description: Generic installable application chart backed by the common-app library.
+      Deploy any container with a Deployment or StatefulSet, Service, Ingress, probes,
+      monitors, autoscaling, and network policies through values alone.
+    digest: dd2c43b52480914c71731d7778a9f336477122d328780cff49ab81ddcffc260e
+    home: https://github.com/ByteFork/helm-charts
+    maintainers:
+    - email: helm@bytefork.io
+      name: ByteFork
+      url: https://github.com/ByteFork
+    name: app
+    sources:
+    - https://github.com/ByteFork/helm-charts
+    type: application
+    urls:
+    - https://github.com/ByteFork/helm-charts/releases/download/app-0.0.1/app-0.0.1.tgz
+    version: 0.0.1
   common-app:
   - annotations:
       artifacthub.io/license: MIT
@@ -145,4 +175,4 @@ entries:
     urls:
     - https://github.com/ByteFork/helm-charts/releases/download/payloadbox-0.0.1/payloadbox-0.0.1.tgz
     version: 0.0.1
-generated: "2026-05-28T19:51:47.9962455Z"
+generated: "2026-07-30T00:10:48.338190053Z"
