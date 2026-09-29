@@ -33,7 +33,7 @@ jobs:
       charts: ${{ steps.filter.outputs.changes }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Detect changed charts
         id: filter
@@ -53,7 +53,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -61,26 +61,26 @@ jobs:
         uses: azure/setup-helm@v5
 
       - name: Set up Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version: stable
           cache: false
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.x"
 
       - name: Cache Go bin
         id: cache-go-bin
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/go/bin
           key: ${{ runner.os }}-go-bin-kubeconform-${{ env.KUBECONFORM_VERSION }}-helm-docs-${{ env.HELM_DOCS_VERSION }}
 
       - name: Cache helm plugins
         id: cache-helm-plugins
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/.local/share/helm/plugins
           key: ${{ runner.os }}-helm-plugins-schema-${{ env.HELM_SCHEMA_PLUGIN_VERSION }}
@@ -124,7 +124,7 @@ jobs:
             --validate-yaml=true
 
       - name: Cache kubeconform schemas
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: .cache/kubeconform
           key: ${{ runner.os }}-kubeconform-${{ env.KUBERNETES_VERSION }}-${{ hashFiles('charts/**/*.tpl', 'charts/**/values.yaml') }}
