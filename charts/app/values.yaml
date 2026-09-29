@@ -44,6 +44,11 @@ image:
   # -- Container image pull policy.
   pullPolicy: IfNotPresent
 
+# -- Container command override. Leave empty to use the image entrypoint.
+command: []
+# -- Container arguments. Leave empty to use the image defaults.
+args: []
+
 # -- Image pull secrets attached to the pod.
 imagePullSecrets: []
 
@@ -317,6 +322,10 @@ resources: {}
 nodeSelector: {}
 # -- Pod tolerations.
 tolerations: []
+
+# -- Additional Kubernetes manifests rendered alongside the application resources. Each list item is a manifest object and supports Helm templating.
+extraManifests: []
+
 # -- Pod affinity.
 affinity: {}
 
