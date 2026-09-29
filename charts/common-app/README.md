@@ -19,7 +19,7 @@ The library renders one primary application workload per release:
 - optional `ServiceMonitor`
 - optional `PodMonitor`
 
-It also centralizes labels, selectors, probes, environment variables, service account configuration, pod security context, container security context, resources, node selectors, tolerations, affinity, and extra volumes.
+It also centralizes labels, selectors, container commands and arguments, probes, environment variables, service account configuration, pod security context, container security context, resources, node selectors, tolerations, affinity, and extra volumes. Use `extraManifests` to render additional resources such as PVCs, Jobs, or Deployments.
 
 ## Usage
 
@@ -28,7 +28,7 @@ Add `common-app` as a dependency from the ByteFork chart repository or by local 
 ```yaml
 dependencies:
   - name: common-app
-    version: 0.0.1
+    version: 0.0.2
     repository: https://bytefork.github.io/helm-charts
 ```
 
@@ -71,6 +71,8 @@ The library expects application charts to expose the values they want to support
 | image.repository | string | `""` | Container image repository. Required by consuming charts. |
 | image.tag | string | `""` | Container image tag. Defaults to chart `appVersion` when empty. |
 | image.pullPolicy | string | `"IfNotPresent"` | Container image pull policy. |
+| command | list | `[]` | Container command override. Leave empty to use the image entrypoint. |
+| args | list | `[]` | Container arguments. Leave empty to use the image defaults. |
 | imagePullSecrets | list | `[]` | Image pull secrets attached to the pod. |
 | deployment | object | `{"annotations":{},"enabled":true,"labels":{}}` | Deployment configuration. |
 | deployment.enabled | bool | `true` | Create a Deployment workload. |
@@ -192,6 +194,7 @@ The library expects application charts to expose the values they want to support
 | resources | object | `{}` | Container resource requests and limits. |
 | nodeSelector | object | `{}` | Pod node selector. |
 | tolerations | list | `[]` | Pod tolerations. |
+| extraManifests | list | `[]` | Additional Kubernetes manifests rendered alongside the application resources. Each list item is a manifest object and supports Helm templating. |
 | affinity | object | `{}` | Pod affinity. |
 | extraVolumeMounts | list | `[]` | Additional volume mounts added to the primary container. |
 | extraVolumes | list | `[]` | Additional volumes added to the pod. |

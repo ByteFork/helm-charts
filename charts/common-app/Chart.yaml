@@ -2,7 +2,7 @@ apiVersion: v2
 name: common-app
 description: Shared Helm library chart for deploying applications on Kubernetes.
 type: library
-version: 0.0.1
+version: 0.0.2
 appVersion: "0.0.1"
 home: https://github.com/ByteFork/helm-charts
 sources:
