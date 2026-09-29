@@ -38,6 +38,27 @@ entries:
           url: https://github.com/ByteFork/helm-charts
     apiVersion: v2
     appVersion: 0.0.1
+    created: "2026-09-29T17:33:42.134930384Z"
+    description: Shared Helm library chart for deploying applications on Kubernetes.
+    digest: 36bb5284f665cf22378957224b75243d6fdf99d35663ca315fa705671ce96b9f
+    home: https://github.com/ByteFork/helm-charts
+    maintainers:
+    - name: ByteFork
+      url: https://github.com/ByteFork
+    name: common-app
+    sources:
+    - https://github.com/ByteFork/helm-charts
+    type: library
+    urls:
+    - https://github.com/ByteFork/helm-charts/releases/download/common-app-0.0.2/common-app-0.0.2.tgz
+    version: 0.0.2
+  - annotations:
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |-
+        - name: Source
+          url: https://github.com/ByteFork/helm-charts
+    apiVersion: v2
+    appVersion: 0.0.1
     created: "2026-05-03T01:02:46.168598207Z"
     description: Shared Helm library chart for deploying applications on Kubernetes.
     digest: 9f07529e421a8a5bf44cef4c7c03b8ee7c988209c1cb4497036fb26de05382dd
@@ -175,4 +196,4 @@ entries:
     urls:
     - https://github.com/ByteFork/helm-charts/releases/download/payloadbox-0.0.1/payloadbox-0.0.1.tgz
     version: 0.0.1
-generated: "2026-07-30T00:10:48.338190053Z"
+generated: "2026-09-29T17:33:42.134950484Z"
