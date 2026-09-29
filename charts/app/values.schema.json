@@ -5,6 +5,9 @@
         "affinity": {
             "type": "object"
         },
+        "args": {
+            "type": "array"
+        },
         "autoscaling": {
             "type": "object",
             "properties": {
@@ -36,6 +39,9 @@
                     ]
                 }
             }
+        },
+        "command": {
+            "type": "array"
         },
         "commonAnnotations": {
             "type": "object"
@@ -90,6 +96,9 @@
             "type": "object"
         },
         "extraContainerPorts": {
+            "type": "array"
+        },
+        "extraManifests": {
             "type": "array"
         },
         "extraVolumeMounts": {

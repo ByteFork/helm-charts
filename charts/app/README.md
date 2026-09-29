@@ -1,6 +1,6 @@
 # app
 
-![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1](https://img.shields.io/badge/AppVersion-0.0.1-informational?style=flat-square)
+![Version: 0.0.2](https://img.shields.io/badge/Version-0.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1](https://img.shields.io/badge/AppVersion-0.0.1-informational?style=flat-square)
 
 Generic installable application chart backed by the common-app library. Deploy any container with a Deployment or StatefulSet, Service, Ingress, probes, monitors, autoscaling, and network policies through values alone.
 
@@ -20,13 +20,14 @@ Generic installable application chart backed by the common-app library. Deploy a
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://bytefork.github.io/helm-charts | common-app | 0.0.1 |
+| https://bytefork.github.io/helm-charts | common-app | 0.0.2 |
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Pod affinity. |
+| args | list | `[]` | Container arguments. Leave empty to use the image defaults. |
 | autoscaling | object | `{"annotations":{},"behavior":{},"enabled":false,"labels":{},"maxReplicas":3,"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | HorizontalPodAutoscaler configuration. |
 | autoscaling.annotations | object | `{}` | Annotations added to the HorizontalPodAutoscaler. |
 | autoscaling.behavior | object | `{}` | HorizontalPodAutoscaler behavior configuration. |
@@ -36,6 +37,7 @@ Generic installable application chart backed by the common-app library. Deploy a
 | autoscaling.minReplicas | int | `1` | Minimum number of replicas. |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` | Target average CPU utilization percentage. |
 | autoscaling.targetMemoryUtilizationPercentage | string | `nil` | Target average memory utilization percentage. |
+| command | list | `[]` | Container command override. Leave empty to use the image entrypoint. |
 | commonAnnotations | object | `{}` | Annotations added to all resources rendered by the library. |
 | commonLabels | object | `{}` | Labels added to all resources rendered by the library. |
 | configMap | object | `{"annotations":{},"data":{},"enabled":false,"labels":{},"name":""}` | ConfigMap configuration. |
@@ -53,6 +55,7 @@ Generic installable application chart backed by the common-app library. Deploy a
 | envFrom | list | `[]` | Additional envFrom entries. |
 | envMap | object | `{}` | Additional literal environment variables rendered as Kubernetes env entries. |
 | extraContainerPorts | list | `[]` | Additional container ports appended after the primary `http` port. Each entry must match the Kubernetes ContainerPort shape. |
+| extraManifests | list | `[]` | Additional Kubernetes manifests rendered alongside the application resources. Each list item is a manifest object and supports Helm templating. |
 | extraVolumeMounts | list | `[]` | Additional volume mounts added to the primary container. |
 | extraVolumes | list | `[]` | Additional volumes added to the pod. |
 | fullnameOverride | string | `""` | Override the full generated resource name. |
