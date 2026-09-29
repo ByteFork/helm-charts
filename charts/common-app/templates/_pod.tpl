@@ -27,6 +27,14 @@ spec:
     - name: {{ include "common-app.name" . }}
       image: {{ include "common-app.image" . | quote }}
       imagePullPolicy: {{ .Values.image.pullPolicy }}
+      {{- with .Values.command }}
+      command:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.args }}
+      args:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       ports:
         - name: http
           containerPort: {{ .Values.containerPort }}

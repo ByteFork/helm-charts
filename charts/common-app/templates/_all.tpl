@@ -20,4 +20,8 @@
 {{ $resource }}
 {{- end }}
 {{- end }}
+{{- range .Values.extraManifests }}
+---
+{{ tpl (toYaml .) $ }}
+{{- end }}
 {{- end -}}

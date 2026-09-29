@@ -3,6 +3,12 @@ image:
   tag: stable-alpine
   pullPolicy: IfNotPresent
 
+command:
+  - nginx
+args:
+  - -g
+  - daemon off;
+
 replicaCount: 1
 
 commonLabels: {}
@@ -183,3 +189,10 @@ tolerations: []
 affinity: {}
 extraVolumeMounts: []
 extraVolumes: []
+extraManifests:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: '{{ include "common-app.fullname" . }}-extra'
+    data:
+      fixture: extra-manifest
